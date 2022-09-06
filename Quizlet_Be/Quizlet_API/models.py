@@ -21,8 +21,8 @@ class UserInClass(models.Model):
     id=models.AutoField(primary_key=True)
     numberOfUsers=models.IntegerField()
     permissions=models.CharField(max_length=100) 
-    UserID=models.ForeignKey(User, ondelete=models.CASCADE)
-    ClassID=models.ForeignKey(Class, ondelete=models.CASCADE)
+    UserID=models.ForeignKey(User, on_delete=models.CASCADE)
+    ClassID=models.ForeignKey(Class, on_delete=models.CASCADE)
 class Course(models.Model):
     id=models.AutoField(primary_key=True)
     coursename=models.CharField(max_length=255)
