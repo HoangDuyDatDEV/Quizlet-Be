@@ -10,4 +10,5 @@ urlpatterns = [
     path('update-course/<int:pk>/', update_course),
     path('delete-course/<int:pk>/', delete_course),
     path('search-course', search_course),
+    path('get-course-by/<int:pk>', get_course_by_id),
 ]

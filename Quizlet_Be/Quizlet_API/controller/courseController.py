@@ -93,4 +93,11 @@ def search_course(request):
     data = CourseSerializer(course_list, many = True).data
     return Response(data)
         
-
+@api_view(['GET'])
+def get_course_by_id(request, pk):
+   courses = Course.objects.filter(pk=pk).first()
+   if courses:
+      result = CourseSerializer(courses).data
+      return Response(result)
+   else:
+      return Response(status=status.HTTP_404_NOT_FOUND)
