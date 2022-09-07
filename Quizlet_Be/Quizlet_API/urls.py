@@ -8,6 +8,6 @@ urlpatterns = [
     path('course-all/', view_course),
     path('create-course/', add_course),
     path('update-course/<int:pk>/', update_course),
-    path('delete-course/<int:pk>', delete_course),
-    path('search-course/<int:id>', search_course),
+    path('delete-course/<int:pk>/', delete_course),
+    path('search-course', search_course),
 ]

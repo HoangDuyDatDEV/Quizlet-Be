@@ -78,14 +78,14 @@ def update_course(request, pk):
 @api_view(['DELETE'])
 def delete_course(request, pk):
     try:
-        courses = Course.objects.get(pk = pk)
+        courses = Course.objects.get(pk=pk)
         courses.delete()
         return Response({'success': True})
     except Exception as e:
         return Response({'success':False, 'error':str(e)})
     
 @api_view(['GET'])
-def search_course(request, pk):
+def search_course(request):
     keyword = request.GET.get('keyword','')
     course_list = Course.objects.filter(
         Q(coursename__icontains = keyword)
