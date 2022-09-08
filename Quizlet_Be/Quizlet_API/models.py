@@ -1,36 +1,23 @@
-import email
-from enum import auto
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+
 # Create your models here.
-class User(models.Model):
+class User(AbstractUser):
     id = models.AutoField(primary_key=True)
+    username=None
     phone = models.IntegerField()
     password = models.CharField(max_length=100)
     fullname = models.CharField(max_length=100)
-    email=models.CharField(max_length=100)
-    otp=models.IntegerField()
+    email = models.EmailField(unique=True, blank=True)
+    otp=models.IntegerField(blank=True)
+    
+    
+    
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+   
 
-    def CheckLogin(email, password):
-      try:
-        user=User.objects.get(email=email,password=password)
-        if user is not None:
-           return{
-            'id':user.id,
-            'email':user.email,
-            'password':user.password,
-            'full_name':user.full_name,
-           }
-        else:
-           return{
-            'id':None,
-            'email':None,
-            'password':None,
-            'full_name':None
-        }
-      except:
-        print('Checklogin failed')
-        return False
 class Class(models.Model):
     id = models.AutoField(primary_key=True)
     classname=models.CharField(max_length=255)
