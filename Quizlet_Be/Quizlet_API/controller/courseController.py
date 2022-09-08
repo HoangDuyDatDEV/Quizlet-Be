@@ -22,10 +22,8 @@ class UserView(APIView):
             serializer.save()
         else:
             return Response(serializer.errors, status = 404)
-        
-        
 
-
+        
 class CourseView(APIView):
     def get(self, request):
         course_list = Course.objects.all()

@@ -3,6 +3,7 @@ from enum import auto
 from django.db import models
 
 # Create your models here.
+
 class User(models.Model):
     id = models.AutoField(primary_key=True)
     phone = models.IntegerField()
@@ -10,6 +11,7 @@ class User(models.Model):
     fullname = models.CharField(max_length=100)
     email=models.CharField(max_length=100)
     otp=models.IntegerField(blank=True)
+
 class Class(models.Model):
     id = models.AutoField(primary_key=True)
     classname=models.CharField(max_length=255)
@@ -17,12 +19,14 @@ class Class(models.Model):
     schoolname = models.CharField(max_length=255)
     allowAddMember=models.CharField(max_length=255)
     createDate=models.DateField(auto_now_add=True)
+
 class UserInClass(models.Model):
     id=models.AutoField(primary_key=True)
     numberOfUsers=models.IntegerField()
     permissions=models.CharField(max_length=100) 
     UserID=models.ForeignKey(User, on_delete=models.CASCADE)
     ClassID=models.ForeignKey(Class, on_delete=models.CASCADE)
+
 class Course(models.Model):
     id=models.AutoField(primary_key=True)
     coursename=models.CharField(max_length=255)
@@ -30,26 +34,31 @@ class Course(models.Model):
     allowDisplay=models.CharField(max_length=20)
     allowEdit=models.CharField(max_length=20)
     UserID=models.ForeignKey(User, on_delete=models.CASCADE)
+
 class CourseInClass(models.Model):
     id = models.AutoField(primary_key=True)
     numberOfCourse=models.IntegerField()
     courseID=models.ForeignKey(Course, on_delete=models.CASCADE)
     classID=models.ForeignKey(Class, on_delete=models.CASCADE)
+
 class Folder(models.Model):
     id=models.AutoField(primary_key=True)
     foldername=models.CharField(max_length=255)
     description=models.TextField(blank=True)
     UserID=models.ForeignKey(User,on_delete=models.CASCADE)
+
 class CourseInFolder(models.Model):
     id = models.AutoField(primary_key=True)
     numberOfCourse=models.IntegerField()
     courseID=models.ForeignKey(Course, on_delete=models.CASCADE)
     folderID=models.ForeignKey(Folder, on_delete=models.CASCADE)
+
 class FolderInClass(models.Model):
     id=models.AutoField(primary_key=True)
     numberOfFolder=models.IntegerField()
     ClassID=models.ForeignKey(Class, on_delete=models.CASCADE)
     FolderID=models.ForeignKey(Folder, on_delete=models.CASCADE)
+
 class FlashCard(models.Model):
     id=models.AutoField(primary_key=True)
     keyword=models.CharField(max_length=255)

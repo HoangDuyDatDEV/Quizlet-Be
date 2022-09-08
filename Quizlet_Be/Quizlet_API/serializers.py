@@ -14,3 +14,16 @@ class CourseSerializer(ModelSerializer):
     class Meta:
         model = Course
         fields = '__all__'
+
+
+class ClassSerializer(ModelSerializer):
+    class Meta:
+        model = Class
+        fields = '__all__'
+
+
+class FolderSerializer(ModelSerializer):
+    class Meta:
+        model = Folder
+        fields = '__all__'
+
