@@ -1,4 +1,6 @@
 from django.contrib.auth.models import AbstractUser
+import email
+from enum import auto
 from django.db import models
 
 
