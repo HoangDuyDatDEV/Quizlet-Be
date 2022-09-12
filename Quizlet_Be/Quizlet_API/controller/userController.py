@@ -6,6 +6,7 @@ from ..serializers import UserSerializer
 from rest_framework.exceptions import AuthenticationFailed
 import jwt,datetime
 from rest_framework import status
+from rest_framework.decorators import api_view
 
 class RegisterView(APIView):
   def post(self,request):
@@ -61,24 +62,24 @@ class LoginView(APIView):
       'data':serializer.data
     }
     return response
-# class UserView(APIView):
+class UserView(APIView):
 
-#   def get(self, request):
-#     token = request.COOKIES.get('jwt')
+  def get(self, request):
+    token = request.COOKIES.get('jwt')
     
-#     if not token:
-#       raise AuthenticationFailed('Unauthenticated') 
+    if not token:
+      raise AuthenticationFailed('Unauthenticated') 
     
-#     try:
-#       payload=jwt.decode(token,'secret',algorithms=['HS256'])
-#     except jwt.ExpiredSignatureError:
-#       raise AuthenticationFailed('Unauthenticated') 
+    try:
+      payload=jwt.decode(token,'secret',algorithms=['HS256'])
+    except jwt.ExpiredSignatureError:
+      raise AuthenticationFailed('Unauthenticated') 
     
-#     user=User.objects.filter(id=payload['id']).first()
+    user=User.objects.filter(id=payload['id']).first()
     
-#     serializer=UserSerializer(user)
+    serializer=UserSerializer(user)
     
-#     return Response(serializer.data)
+    return Response(serializer.data)
 class LogoutView(APIView):
   def post(self, request):
     response=Response()
@@ -87,3 +88,12 @@ class LogoutView(APIView):
       'message':'success'
     }
     return response
+
+@api_view(['GET'])
+def get_user_by_id(request, pk):
+   user = User.objects.filter(pk=pk).first()
+   if user:
+      result = UserSerializer(user).data
+      return Response(result)
+   else:
+      return Response(status=status.HTTP_404_NOT_FOUND)

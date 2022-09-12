@@ -10,7 +10,7 @@ from django.db.models import Q
 
 
 @api_view(['GET'])
-def view_folder(request):   
+def get_all_folder(request):   
     folders =  Folder.objects.all()
         
     if folders:

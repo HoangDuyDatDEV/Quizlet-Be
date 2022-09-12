@@ -1,7 +1,10 @@
+from http.client import REQUEST_ENTITY_TOO_LARGE
 from django.shortcuts import render
+
+
 from ..serializers import *
 from rest_framework.response import Response
-from ..models import Course
+from ..models import *
 from Quizlet_API import serializers
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -9,8 +12,9 @@ from django.db.models import Q
 
 
 
+
 @api_view(['GET'])
-def view_class(request):   
+def get_all_class(request):   
     classes =  Class.objects.all()
         
     if classes:
@@ -24,9 +28,15 @@ def view_class(request):
 def add_class(request):
     classes = ClassSerializer(data = request.data)
     
+    user=request.user.id
+    print(user)
     if classes.is_valid():
         classes.save()
-        return Response(classes.data)
+        # userinclass=UserInClass.objects.create(UserID=user,ClassID=classes.,permissions='1',numberOfUsers=0)
+        # userinclass.save()
+        return Response(classes.data,
+                        #    userinclass
+                        )
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
@@ -71,3 +81,8 @@ def get_class_by_id(request, pk):
       return Response(result)
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
+
+# @api_view(['POST'])
+# def add_course_in_class(request):
+#     def addtoclass(classID,courseID,numberOfCourse):
+#         class =Class.objects.get(userID=us)

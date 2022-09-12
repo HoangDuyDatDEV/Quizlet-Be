@@ -1,3 +1,4 @@
+from email.policy import default
 from django.contrib.auth.models import AbstractUser
 import email
 from enum import auto
@@ -13,6 +14,7 @@ class User(AbstractUser):
     fullname = models.CharField(max_length=100)
     email = models.EmailField(unique=True, blank=True)
     otp=models.IntegerField(blank=True)
+    role=models.CharField(max_length=200,default=False)
     
     
     
@@ -27,9 +29,10 @@ class Class(models.Model):
     schoolname = models.CharField(max_length=255)
     allowAddMember=models.CharField(max_length=255)
     createDate=models.DateField(auto_now_add=True)
+    members=models.ManyToManyField(User, through='UserInClass')
 class UserInClass(models.Model):
     id=models.AutoField(primary_key=True)
-    numberOfUsers=models.IntegerField()
+    numberOfUsers=models.IntegerField(default=0)
     permissions=models.CharField(max_length=100) 
     UserID=models.ForeignKey(User, on_delete=models.CASCADE)
     ClassID=models.ForeignKey(Class, on_delete=models.CASCADE)

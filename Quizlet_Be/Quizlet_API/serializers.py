@@ -33,3 +33,7 @@ class FolderSerializer(ModelSerializer):
     class Meta:
         model = Folder
         fields = '__all__'
+class CourseInClassSerializer(ModelSerializer):
+    class Meta:
+        model = CourseInClass
+        fields = '__all__'
