@@ -29,4 +29,8 @@ urlpatterns = [
     path('delete-class/<int:pk>/', delete_class),
     path('search-class', search_class),
     path('get-class-by/<int:pk>', get_class_by_id),
+    path('addClassByMember', add_class_By_Member),
+    path('addCourseInClass', add_course_in_class),
+    
+   
 ]

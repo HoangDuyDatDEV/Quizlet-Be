@@ -32,27 +32,27 @@ class Class(models.Model):
     members=models.ManyToManyField(User, through='UserInClass')
 class UserInClass(models.Model):
     id=models.AutoField(primary_key=True)
-    numberOfUsers=models.IntegerField(default=0)
+    numberOfUsers=models.IntegerField(default=0, blank=True)
     permissions=models.CharField(max_length=100) 
-    UserID=models.ForeignKey(User, on_delete=models.CASCADE)
-    ClassID=models.ForeignKey(Class, on_delete=models.CASCADE)
+    userID=models.ForeignKey(User, on_delete=models.CASCADE)
+    classID=models.ForeignKey(Class, on_delete=models.CASCADE)
 class Course(models.Model):
     id=models.AutoField(primary_key=True)
     coursename=models.CharField(max_length=255)
     description=models.TextField(null=True)
     allowDisplay=models.CharField(max_length=20)
     allowEdit=models.CharField(max_length=20)
-    UserID=models.ForeignKey(User, on_delete=models.CASCADE)
+    userID=models.ForeignKey(User, on_delete=models.CASCADE)
 class CourseInClass(models.Model):
     id = models.AutoField(primary_key=True)
-    numberOfCourse=models.IntegerField()
+    numberOfCourse=models.IntegerField(default=0,blank=True)
     courseID=models.ForeignKey(Course, on_delete=models.CASCADE)
     classID=models.ForeignKey(Class, on_delete=models.CASCADE)
 class Folder(models.Model):
     id=models.AutoField(primary_key=True)
     foldername=models.CharField(max_length=255)
     description=models.TextField(null=True)
-    UserID=models.ForeignKey(User,on_delete=models.CASCADE)
+    userID=models.ForeignKey(User,on_delete=models.CASCADE)
 class CourseInFolder(models.Model):
     id = models.AutoField(primary_key=True)
     numberOfCourse=models.IntegerField()
@@ -61,13 +61,13 @@ class CourseInFolder(models.Model):
 class FolderInClass(models.Model):
     id=models.AutoField(primary_key=True)
     numberOfFolder=models.IntegerField()
-    ClassID=models.ForeignKey(Class, on_delete=models.CASCADE)
-    FolderID=models.ForeignKey(Folder, on_delete=models.CASCADE)
+    classID=models.ForeignKey(Class, on_delete=models.CASCADE)
+    folderID=models.ForeignKey(Folder, on_delete=models.CASCADE)
 class FlashCard(models.Model):
     id=models.AutoField(primary_key=True)
     keyword=models.CharField(max_length=255)
     defindName=models.CharField(max_length=255)
     image=models.ImageField(max_length=255)
     learned=models.CharField(max_length=20)
-    CourseID=models.ForeignKey(Course, on_delete=models.CASCADE)
+    courseID=models.ForeignKey(Course, on_delete=models.CASCADE)
 

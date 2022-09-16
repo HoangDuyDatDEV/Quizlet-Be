@@ -1,6 +1,8 @@
 from http.client import REQUEST_ENTITY_TOO_LARGE
 from django.shortcuts import render
 
+from Quizlet_API.views import add_course_to_class, permissionUser
+
 
 from ..serializers import *
 from rest_framework.response import Response
@@ -27,19 +29,12 @@ def get_all_class(request):
 @api_view(['POST'])
 def add_class(request):
     classes = ClassSerializer(data = request.data)
-    
-    user=request.user.id
-    print(user)
     if classes.is_valid():
         classes.save()
-        # userinclass=UserInClass.objects.create(UserID=user,ClassID=classes.,permissions='1',numberOfUsers=0)
-        # userinclass.save()
-        return Response(classes.data,
-                        #    userinclass
-                        )
+        
+        return Response(classes.data)
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
-
 
 @api_view(['PUT'])
 def update_class(request, pk):
@@ -82,7 +77,28 @@ def get_class_by_id(request, pk):
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
-# @api_view(['POST'])
-# def add_course_in_class(request):
-#     def addtoclass(classID,courseID,numberOfCourse):
-#         class =Class.objects.get(userID=us)
+@api_view(['POST'])
+def add_course_in_class(request):
+    data=request.data  
+    courseID=data['courseID']
+    classID=data['classID']
+    numberOfCourse=data['numberOfCourse']
+    add_course_to_class(classID,courseID,numberOfCourse)
+    return Response(data)
+
+@api_view(['POST'])
+def add_class_By_Member(request):
+    data=request.data.copy()
+    data['permissions']='created'
+    userinclass= UserInClassSerializer(data=data)
+        
+    if userinclass.is_valid():
+        userID=data.get('userID')
+        classID=data.get('classID')
+        userinclass=userinclass.save()
+        
+        userinclass=UserInClassSerializer(userinclass)
+        print (userinclass)
+        print (userinclass.data)
+        return Response(userinclass.data, status=status.HTTP_201_CREATED)
+    return Response(userinclass.errors, status=status.HTTP_400_BAD_REQUEST)

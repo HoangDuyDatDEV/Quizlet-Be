@@ -37,3 +37,9 @@ class CourseInClassSerializer(ModelSerializer):
     class Meta:
         model = CourseInClass
         fields = '__all__'
+class UserInClassSerializer(ModelSerializer):
+    class Meta:
+        model = UserInClass
+        fields = '__all__'
+
+    
