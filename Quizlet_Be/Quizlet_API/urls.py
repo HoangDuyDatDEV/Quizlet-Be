@@ -1,8 +1,5 @@
 
-from Quizlet_API.controller.classController import *
-from Quizlet_API.controller.folderController import *
-from .controller.courseController import *
-from .controller.userController import *
+from .views import *
 from django.urls import path
 
 urlpatterns = [
@@ -31,6 +28,6 @@ urlpatterns = [
     path('get-class-by/<int:pk>', get_class_by_id),
     path('addClassByMember', add_class_By_Member),
     path('addCourseInClass', add_course_in_class),
-    
+    path('addMemberToClass/<str:pk>/', add_Member_To_Class),
    
 ]
