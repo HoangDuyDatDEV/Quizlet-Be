@@ -182,7 +182,19 @@ def add_course_in_class(request):
                       })
     return Response(courseinclass.errors,status=status.HTTP_400_BAD_REQUEST)
 
-
+@api_view(['POST'])
+def add_folder_in_class(request):
+    data=request.data
+    classID=data.get('classID')
+    folderinclass=FolderInClassSerializer(data=data)
+    if folderinclass.is_valid():  
+      folderinclass.save()
+      numberOfFolder=FolderInClass.objects.filter(classID=classID).count()
+      return Response({'data':folderinclass.data,
+                      'status':status.HTTP_201_CREATED,
+                      'numberOfFolder':numberOfFolder
+                      })
+    return Response(folderinclass.errors,status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def add_class_By_Member(request):
@@ -242,6 +254,66 @@ def check_Duplicate_Member(userID,ID):
     return True
   else:
     return False
+
+@api_view(['GET'])
+def get_all_course_in_class(request):   
+    courseinclass =  CourseInClass.objects.all()
+        
+    if courseinclass:
+        result = CourseInClassSerializer(courseinclass, many = True).data
+        return Response(result)
+    else:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def get_all_folder_in_class(request):   
+    folderinclass =  FolderInClass.objects.all()
+        
+    if folderinclass:
+        result = FolderInClassSerializer(folderinclass, many = True).data
+        return Response(result)
+    else:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def get_all_user_in_class(request,pk):   
+    courseinclass =  CourseInClass.objects.get(permissions='member',classID=pk)
+
+    if courseinclass:
+        result = CourseInClassSerializer(courseinclass, many = True).data
+        return Response(result)
+    else:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+@api_view(['DELETE'])
+def delete_member_in_class(request, pk):
+    try:
+        userinclass = UserInClass.objects.get(pk=pk)
+        userinclass.delete()
+        return Response({'success': True})
+    except Exception as e:
+        return Response({'success':False, 'error':str(e)})
+
+@api_view(['DELETE'])
+def delete_all_member_in_class(request,pk):
+    try:
+        userinclass = UserInClass.objects.get(permissions='member',classID=pk)
+        userinclass.delete()
+        return Response({'success': True})
+    except Exception as e:
+        return Response({'success':False, 'error':str(e)})
+
+@api_view(['DELETE'])
+def delete_course_in_class(request,pk):
+    try:
+        courseinclass = CourseInClass.objects.get(pk=pk)
+        courseinclass.delete()
+        return Response({'success': True})
+    except Exception as e:
+        return Response({'success':False, 'error':str(e)})
+
+
+
 
 # CourseAPI
 @api_view(['GET'])
