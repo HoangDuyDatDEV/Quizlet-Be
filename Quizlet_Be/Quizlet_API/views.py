@@ -1,3 +1,4 @@
+
 from sre_constants import SUCCESS
 
 from xmlrpc.client import ResponseError
@@ -13,14 +14,16 @@ from http.client import REQUEST_ENTITY_TOO_LARGE
 from django.shortcuts import render
 from Quizlet_API import serializers
 from django.db.models import Q
+
 # UserAPI
+# Api đăng ký
 class RegisterView(APIView):
   def post(self,request):
       serializer = UserSerializer(data=request.data)
       serializer.is_valid(raise_exception=True)
       serializer.save()
       return Response(serializer.data)  
-
+#API đăng nhập 
 class LoginView(APIView):
   def post(self, request):
     email = request.data['email']
@@ -68,6 +71,7 @@ class LoginView(APIView):
       'data':serializer.data
     }
     return response
+#API lấy thông tin user đang đăng nhập
 class UserView(APIView):
 
   def get(self, request):
@@ -86,6 +90,7 @@ class UserView(APIView):
     serializer=UserSerializer(user)
     
     return Response(serializer.data)
+#API đăng xuất
 class LogoutView(APIView):
   def post(self, request):
     response=Response()
@@ -94,7 +99,7 @@ class LogoutView(APIView):
       'message':'success'
     }
     return response
-
+# API lấy thông tin user theo id
 @api_view(['GET'])
 def get_user_by_id(request, pk):
    user = User.objects.filter(pk=pk).first()
@@ -103,6 +108,24 @@ def get_user_by_id(request, pk):
       return Response(result)
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
+      
+# API thay đổi thông tin user
+@api_view(['PUT'])
+def edit_user(request, pk):
+    users = User.objects.get(pk = pk)
+    data=request.data
+    serializer = UpdateUserSerializer(users,data)
+    
+    
+    if users.email==data['email']:
+        if serializer.is_valid():
+          serializer.save()
+          return Response(serializer.data)
+        else:
+          return Response(serializer.errors,status = status.HTTP_404_NOT_FOUND)
+    else:
+        return Response({'response':"bạn không có quyền thay đổi thông tin người dùng"})
+
 
 #ClassAPI
 

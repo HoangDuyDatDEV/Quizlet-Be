@@ -9,7 +9,7 @@ from django.db import models
 class User(AbstractUser):
     id = models.AutoField(primary_key=True)
     username=None
-    phone = models.IntegerField()
+    phone = models.IntegerField(blank=True)
     password = models.CharField(max_length=100)
     fullname = models.CharField(max_length=100)
     email = models.EmailField(unique=True, blank=True)

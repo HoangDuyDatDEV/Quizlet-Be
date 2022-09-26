@@ -8,6 +8,8 @@ urlpatterns = [
     path('user', UserView.as_view()),
     path('logout', LogoutView.as_view()),  
     path('user', UserView.as_view()),
+    path('edit-user/<int:pk>/',edit_user),
+    path('get-user-by/<int:pk>',get_user_by_id),
     path('course-all/', get_all_course),
     path('create-course/', add_course),
     path('update-course/<int:pk>/', update_course),
