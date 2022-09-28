@@ -29,11 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Duplicate")
         return lower_email
 
-class ChangePasswordSerializer(serializers.Serializer):
-    model = User
 
-    old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
 class CourseSerializer(ModelSerializer):
     class Meta:
         model = Course
@@ -46,7 +42,7 @@ class ClassSerializer(ModelSerializer):
     class Meta:
         model = Class
         fields = '__all__'
-
+   
 
 class FolderSerializer(ModelSerializer):
     class Meta:
@@ -56,7 +52,7 @@ class CourseInClassSerializer(ModelSerializer):
     class Meta:
         model = CourseInClass
         fields = '__all__'
-        
+    
 class UserInClassSerializer(ModelSerializer):
     class Meta:
         model = UserInClass

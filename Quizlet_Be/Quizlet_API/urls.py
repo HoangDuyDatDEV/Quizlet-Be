@@ -30,6 +30,15 @@ urlpatterns = [
     path('get-class-by/<int:pk>', get_class_by_id),
     path('addClassByMember', add_class_By_Member),
     path('addCourseInClass', add_course_in_class),
+    path('addFolderInClass', add_folder_in_class),
     path('addMemberToClass/<str:pk>/', add_Member_To_Class),
-   
+    path('getAllCourseInClass/<int:pk>/', get_all_course_in_class),
+    path('getAllFolderInClass/<int:pk>/',  get_all_folder_in_class),
+    path('getAllMemberInClass/<int:pk>/',  get_all_user_in_class),
+    path('deleteMemberInClass/<int:pk>/',  delete_member_in_class),
+    path('deleteAllMemberInClass/<int:pk>/',  delete_all_member_in_class),
+    path('deleteCourseInClass/<int:pk>/',  delete_course_in_class),
+    path('getCourseInClassBy/<int:pk>/',  get_course_in_class_by_id),
+    path('getFolderInClassBy/<int:pk>/',  get_folder_in_class_by_id),
+    path('deleteFolderInClass/<int:pk>/',  delete_folder_in_class),
 ]

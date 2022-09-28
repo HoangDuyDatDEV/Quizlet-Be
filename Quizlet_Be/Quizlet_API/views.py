@@ -127,19 +127,22 @@ def edit_user(request, pk):
         return Response({'response':"bạn không có quyền thay đổi thông tin người dùng"})
 
 
-#ClassAPI
+######ClassAPI
 
+#API lấy thông tin của tất cả các lớp 
 @api_view(['GET'])
 def get_all_class(request):   
     classes =  Class.objects.all()
         
     if classes:
         result = ClassSerializer(classes, many = True).data
-        return Response(result)
+        return Response({ 'data': result,
+                         'status': status.HTTP_200_OK,
+                          })
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
     
-
+# API thêm thông tin lớp  
 @api_view(['POST'])
 def add_class(request):
     classes = ClassSerializer(data = request.data)
@@ -150,18 +153,19 @@ def add_class(request):
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
-@api_view(['PUT'])
+# API sửa thông tin lớp 
+@api_view(['PUT']) 
 def update_class(request, pk):
     classes = Class.objects.get(pk = pk)
-    serializer = ClassSerializer(data = request.data, instance=classes)
+    serializer = ClassSerializer(classes,data = request.data )
     
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
     else:
-        return Response(status = status.HTTP_404_NOT_FOUND) 
+        return Response(serializer.errors,status = status.HTTP_404_NOT_FOUND) 
         
-
+#API xóa thông tin lớp  
 @api_view(['DELETE'])
 def delete_class(request, pk):
     try:
@@ -181,44 +185,52 @@ def search_class(request):
     data = ClassSerializer(Class_list, many = True).data
     return Response(data)
         
-
+# API lấy lớp theo ID 
 @api_view(['GET'])
 def get_class_by_id(request, pk):
    classes = Class.objects.filter(pk=pk).first()
+   numberOfCourse=CourseInClass.objects.filter(classID=pk).count()
+   numberOfMember = UserInClass.objects.filter(permissions='member',classID=pk).count()
    if classes:
       result = ClassSerializer(classes).data
-      return Response(result)
+      return Response({'data':result,
+                        'numberOfCourse':numberOfCourse,
+                        'numberOfCMember':numberOfMember
+                        })
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
+#API thêm khóa học vào lớp 
 @api_view(['POST'])
 def add_course_in_class(request):
-    data=request.data
+    data=request.data.copy()
     classID=data.get('classID')
+    data['numberOfCourse']=CourseInClass.objects.filter(classID=classID).count()+1 
     courseinclass=CourseInClassSerializer(data=data)
     if courseinclass.is_valid():  
+     
       courseinclass.save()
-      numberOfCourses=CourseInClass.objects.filter(classID=classID).count()
       return Response({'data':courseinclass.data,
                       'status':status.HTTP_201_CREATED,
-                      'numberOfCourses':numberOfCourses
                       })
     return Response(courseinclass.errors,status=status.HTTP_400_BAD_REQUEST)
 
+#API thêm thư mục vào lớp
 @api_view(['POST'])
 def add_folder_in_class(request):
-    data=request.data
+    data=request.data.copy()
     classID=data.get('classID')
+    data['numberOfFolder']=FolderInClass.objects.filter(classID=classID).count()+1 
     folderinclass=FolderInClassSerializer(data=data)
+    
     if folderinclass.is_valid():  
       folderinclass.save()
-      numberOfFolder=FolderInClass.objects.filter(classID=classID).count()
       return Response({'data':folderinclass.data,
                       'status':status.HTTP_201_CREATED,
-                      'numberOfFolder':numberOfFolder
                       })
     return Response(folderinclass.errors,status=status.HTTP_400_BAD_REQUEST)
 
+# API tạo lớp bởi người dùng 
 @api_view(['POST'])
 def add_class_By_Member(request):
     data=request.data.copy()
@@ -226,26 +238,24 @@ def add_class_By_Member(request):
     userinclass= UserInClassSerializer(data=data)
         
     if userinclass.is_valid():
-        userID=data.get('userID')
-        classID=data.get('classID')
-        userinclass=userinclass.save()
-        
-        userinclass=UserInClassSerializer(userinclass)
-        print (userinclass)
-        print (userinclass.data)
+        userinclass.save()
+
         return Response(userinclass.data, status=status.HTTP_201_CREATED)
     return Response(userinclass.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+# API thêm thành viên vào lớp
 @api_view(['POST'])
 def add_Member_To_Class(request,pk):
     data=request.data.copy()
     userID=data.get('userID')
     classID=data.get('classID')
-    member=UserInClass.objects.filter(userID=userID).first()
+    member=UserInClass.objects.filter(userID=userID,classID=classID).first()
     
     if ( check_Is_Member(userID,pk) ):
-      if (check_Duplicate_Member(member,userID)==False and member.permissions !='member' ):
+      if (check_Duplicate_Member(member,userID)==False  ):
           data['permissions']='member'
+          data['numberOfUsers']=UserInClass.objects.filter(classID=classID,permissions='member').count()+1 
           userinclass= UserInClassSerializer(data=data)
           
           if userinclass.is_valid():
@@ -266,48 +276,80 @@ def add_Member_To_Class(request,pk):
         'status': status.HTTP_404_NOT_FOUND
       })
       
-# 
+#Hàm kiểm tra người dùng có là thành viên ko 
 def check_Is_Member(userID,CreatorID):
   if userID==CreatorID:
     return False
   else:
     return True
+
+#Hàm kiểm tra thành viên đã tồn tại trong lớp chưa 
 def check_Duplicate_Member(userID,ID):
   if userID==ID:
     return True
   else:
     return False
 
+# API lấy khóa học trong lớp 
 @api_view(['GET'])
-def get_all_course_in_class(request):   
-    courseinclass =  CourseInClass.objects.all()
-        
+def get_all_course_in_class(request,pk):   
+    courseinclass =  CourseInClass.objects.filter(classID=pk)
     if courseinclass:
         result = CourseInClassSerializer(courseinclass, many = True).data
-        return Response(result)
+        return Response({'data':result,
+                        
+                        })
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
+
+# API lấy thư mục trong lớp 
 @api_view(['GET'])
-def get_all_folder_in_class(request):   
-    folderinclass =  FolderInClass.objects.all()
+def get_all_folder_in_class(request,pk):   
+    folderinclass =  FolderInClass.objects.filter(classID=pk)
         
     if folderinclass:
         result = FolderInClassSerializer(folderinclass, many = True).data
         return Response(result)
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
+# API lấy thông tin khóa học trong lớp theo id
+@api_view(['GET'])
+def get_course_in_class_by_id(request, pk):
+   courseinclass = CourseInClass.objects.filter(pk=pk).first()
+   
+   if courseinclass:
+      result = CourseInClassSerializer(courseinclass).data
+      return Response({'data':result,
+                        })
+   else:
+      return Response(status=status.HTTP_404_NOT_FOUND)
+      
+# API lấy thông tin folder trong lớp theo id
+@api_view(['GET'])
+def get_folder_in_class_by_id(request, pk):
+   folderinclass = FolderInClass.objects.filter(pk=pk).first()
+   
+   if folderinclass:
+      result = FolderInClassSerializer(folderinclass).data
+      return Response({'data':result,
+                        })
+   else:
+      return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+# API lấy thành viên trong lớp 
 @api_view(['GET'])
 def get_all_user_in_class(request,pk):   
-    courseinclass =  CourseInClass.objects.get(permissions='member',classID=pk)
-
-    if courseinclass:
-        result = CourseInClassSerializer(courseinclass, many = True).data
+    userinclass =  UserInClass.objects.filter(classID=pk,permissions='member')
+        
+    if userinclass:
+        result = UserInClassSerializer(userinclass, many = True).data
         return Response(result)
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
+# API xóa thành viên trong lớp 
 @api_view(['DELETE'])
 def delete_member_in_class(request, pk):
     try:
@@ -317,20 +359,32 @@ def delete_member_in_class(request, pk):
     except Exception as e:
         return Response({'success':False, 'error':str(e)})
 
+#API xóa tất cả thành viên trong lớp
 @api_view(['DELETE'])
 def delete_all_member_in_class(request,pk):
     try:
-        userinclass = UserInClass.objects.get(permissions='member',classID=pk)
+        userinclass = UserInClass.objects.filter(permissions='member',classID=pk)
         userinclass.delete()
         return Response({'success': True})
     except Exception as e:
+      
         return Response({'success':False, 'error':str(e)})
-
+# API xóa khóa học trong lớp
 @api_view(['DELETE'])
 def delete_course_in_class(request,pk):
     try:
         courseinclass = CourseInClass.objects.get(pk=pk)
         courseinclass.delete()
+        return Response({'success': True})
+    except Exception as e:
+        return Response({'success':False, 'error':str(e)})
+
+# API xóa thư mục trong lớp
+@api_view(['DELETE'])
+def delete_folder_in_class(request,pk):
+    try:
+        folderinclass = FolderInClass.objects.get(pk=pk)
+        folderinclass.delete()
         return Response({'success': True})
     except Exception as e:
         return Response({'success':False, 'error':str(e)})
