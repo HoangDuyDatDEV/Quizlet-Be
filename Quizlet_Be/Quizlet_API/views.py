@@ -253,7 +253,7 @@ def add_Member_To_Class(request,pk):
     member=UserInClass.objects.filter(userID=userID,classID=classID).first()
     
     if ( check_Is_Member(userID,pk) ):
-      if (check_Duplicate_Member(member,userID)==False  ):
+      if (check_Duplicate_Member(member,userID)==False ):
           data['permissions']='member'
           data['numberOfUsers']=UserInClass.objects.filter(classID=classID,permissions='member').count()+1 
           userinclass= UserInClassSerializer(data=data)
@@ -273,7 +273,7 @@ def add_Member_To_Class(request,pk):
       raise  ValidationError ({
         'sucess': False,
         'message':'NGười tạo lớp không thể là thành viên',
-        'status': status.HTTP_404_NOT_FOUND
+        'status': status.HTTP_400_BAD_REQUEST
       })
       
 #Hàm kiểm tra người dùng có là thành viên ko 
@@ -388,11 +388,36 @@ def delete_folder_in_class(request,pk):
         return Response({'success': True})
     except Exception as e:
         return Response({'success':False, 'error':str(e)})
+#API lấy user để thêm thành viên vào lớp
+@api_view(['GET'])
+def search_all_user_to_add_member(request):   
+    keyword = request.GET.get('keyword','')
+    User_list = User.objects.all()
+    if keyword:
+      User_list = User.objects.filter(
+          Q(fullname__icontains = keyword)
+      )
+    data = UserSerializer(User_list, many = True).data
+    result = {'data':data}
+    return Response(result)
+    # data=request.data
+    # classID=data.get('classID')
+    # userinclassID=UserInClass.objects.get(classID=classID).userID
+    # user_list = User.objects.get(userinclassID).id
+    # userid= User.objects.all()
+    # for !user_list user_list in userid:
+    #  if  check_is_valid_in_class(userinclassID)==1:
+    #  user_list = User.objects.filter(Q(fullname__icontains = fullname))
+    #  data = UserSerializer(user_list, many = True).data
+    #  result = {'data':data}
+    #  return Response(result)
 
 
+    
+   
+########## CourseAPI
 
-
-# CourseAPI
+#API lấy tất cả các khóa học
 @api_view(['GET'])
 def get_all_course(request):   
     courses = Course.objects.all()
@@ -403,7 +428,7 @@ def get_all_course(request):
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
     
-
+#API tạo khóa học
 @api_view(['POST'])
 def add_course(request):
     course = CourseSerializer(data = request.data)
@@ -414,7 +439,7 @@ def add_course(request):
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
-
+#API sửa đổi thông tin khóa học
 @api_view(['PUT'])
 def update_course(request, pk):
     course = Course.objects.get(pk = pk)
@@ -426,7 +451,7 @@ def update_course(request, pk):
     else:
         return Response(status = status.HTTP_404_NOT_FOUND) 
         
-
+#API xóa khóa học
 @api_view(['DELETE'])
 def delete_course(request, pk):
     try:
@@ -435,16 +460,22 @@ def delete_course(request, pk):
         return Response({'success': True})
     except Exception as e:
         return Response({'success':False, 'error':str(e)})
-    
+
+ #API tìm kiếm khóa học  
 @api_view(['GET'])
 def search_course(request):
     keyword = request.GET.get('keyword','')
-    course_list = Course.objects.filter(
-        Q(coursename__icontains = keyword)
-    )
-    data = CourseSerializer(course_list, many = True).data
-    return Response(data)
-        
+    Course_list = Course.objects.all()
+    if keyword:
+      Course_list = Course.objects.filter(
+          Q(coursename__icontains = keyword)
+      )
+    total = Course_list.count()
+    data = CourseSerializer(Course_list, many = True).data
+    result = {'total':total, 'data':data}
+    return Response(result)
+
+# API lấy thông tin khóa học bằng id        
 @api_view(['GET'])
 def get_course_by_id(request, pk):
    courses = Course.objects.filter(pk=pk).first()
@@ -454,10 +485,62 @@ def get_course_by_id(request, pk):
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
+##### FlashcardAPI 
+#API thêm flashcard
+@api_view(['POST'])
+def add_flashcard(request):
+    flashcard = FlashcardSerializer(data = request.data)
+    
+    if flashcard.is_valid():
+        flashcard.save()
+        return Response({'data':flashcard.data,
+                          'status':status.HTTP_201_CREATED,
+                          })
+    else:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+#API xóa flashcard
+@api_view(['DELETE'])
+def delete_flashcard(request, pk):
+    try:
+        flashcard = FlashCard.objects.get(pk=pk)
+        flashcard.delete()
+        return Response({'success': True})
+    except Exception as e:
+        return Response({'success':False, 'error':str(e)})
 
-# FolderAPI
+
+#API sửu đổi flashcard
+@api_view(['PUT'])
+def update_flashcard(request, pk):
+    flashcard = FlashCard.objects.get(pk = pk)
+    serializer = FlashcardSerializer(data = request.data, instance=FlashCard)
+    
+    if flashcard.is_valid():
+        flashcard.save()
+        return Response(serializer.data)
+    else:
+        return Response(status = status.HTTP_404_NOT_FOUND) 
+
+#API lấy tất cả các flashcard theo khóa học
+@api_view(['GET'])
+def get_all_flashcard(request, pk):   
+    flashcard = FlashCard.objects.filter(courseID=pk)
+        
+    if flashcard:
+        result = CourseSerializer(flashcard, many = True).data
+        return Response({'data':result,
+                          'status':status.HTTP_200_OK,  
+                            })
+    else:
+        return Response(status = status.HTTP_404_NOT_FOUND)
 
 
+
+
+
+############# FolderAPI
+
+#API lấy tất cả thư mục 
 @api_view(['GET'])
 def get_all_folder(request):   
     folders =  Folder.objects.all()
@@ -468,7 +551,7 @@ def get_all_folder(request):
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
     
-
+#API thêm thư mục
 @api_view(['POST'])
 def add_folder(request):
     folder = FolderSerializer(data = request.data)
@@ -479,7 +562,7 @@ def add_folder(request):
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
-
+#API sửa đổi thông tin thư mục
 @api_view(['PUT'])
 def update_folder(request, pk):
     folder = Folder.objects.get(pk = pk)
@@ -491,7 +574,7 @@ def update_folder(request, pk):
     else:
         return Response(status = status.HTTP_404_NOT_FOUND) 
         
-
+#API xóa thông tin thư mục
 @api_view(['DELETE'])
 def delete_folder(request, pk):
     try:
@@ -501,22 +584,77 @@ def delete_folder(request, pk):
     except Exception as e:
         return Response({'success':False, 'error':str(e)})
     
-
+# tìm kiếm thư mục
 @api_view(['GET'])
 def search_folder(request):
     keyword = request.GET.get('keyword','')
-    folder_list = Folder.objects.filter(
-        Q(foldername__icontains = keyword)
-    )
+    folder_list = Folder.objects.all()
+    if keyword:
+      folder_list = Folder.objects.filter(
+          Q(foldername__icontains = keyword)
+      )
+    total = folder_list.count()
     data = FolderSerializer(folder_list, many = True).data
-    return Response(data)
+    result = {'total':total, 'data':data}
+    return Response(result)
         
-
+#tìm kiếm thông tin thư mục theo id
 @api_view(['GET'])
 def get_folder_by_id(request, pk):
    folders = Folder.objects.filter(pk=pk).first()
    if folders:
       result = FolderSerializer(folders).data
       return Response(result)
+   else:
+      return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+#API thêm khóa học vào thư mục
+@api_view(['POST'])
+def add_course_in_folder(request):
+    data=request.data.copy()
+    folderID=data.get('folderID')
+    data['numberOfCourse']=CourseInFolder.objects.filter(folderID=folderID).count()+1 
+    courseinfolder=CourseInFolderSerializer(data=data)
+    if courseinfolder.is_valid():  
+     
+      courseinfolder.save()
+      return Response({'data':courseinfolder.data,
+                      'status':status.HTTP_201_CREATED,
+                      })
+    return Response(courseinfolder.errors,status=status.HTTP_400_BAD_REQUEST)
+
+#API xóa khóa học trong thư mục
+@api_view(['DELETE'])
+def delete_course_in_folder(request,pk):
+    try:
+        courseinfolder = CourseInFolder.objects.get(pk=pk)
+        courseinfolder.delete()
+        return Response({'success': True})
+    except Exception as e:
+        return Response({'success':False, 'error':str(e)})
+
+# API lấy khóa học trong thư mục 
+@api_view(['GET'])
+def get_all_course_in_folder(request,pk):   
+    courseinfolder =  CourseInFolder.objects.filter(folderID=pk)
+  
+    if courseinfolder:
+        result = CourseInFolderSerializer(courseinfolder, many = True).data
+        return Response({'data':result,
+                        
+                        })
+    else:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+# API lấy thông tin khóa học trong thư mục theo id
+@api_view(['GET'])
+def get_course_in_folder_by_id(request, pk):
+   courseinfolder = CourseInFolder.objects.filter(pk=pk).first()
+   
+   if courseinfolder:
+      result = CourseInFolderSerializer(courseinfolder).data
+      return Response({'data':result,
+                        })
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)

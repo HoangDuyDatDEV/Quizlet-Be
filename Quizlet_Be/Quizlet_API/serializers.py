@@ -61,6 +61,12 @@ class FolderInClassSerializer(ModelSerializer):
     class Meta:
         model = FolderInClass
         fields = '__all__'
-    
-
+class FlashcardSerializer(ModelSerializer):
+    class Meta:
+        model = FlashCard
+        fields = '__all__'   
+class CourseInFolderSerializer(ModelSerializer):
+    class Meta:
+        model =CourseInFolder
+        fields = '__all__'
     
