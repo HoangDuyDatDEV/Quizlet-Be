@@ -39,9 +39,24 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'Quizlet_API',
-    'corsheaders'
+    'corsheaders',
+    'django_password_validators',
 ]
-
+AUTH_PASSWORD_VALIDATORS = [
+    
+    {
+        'NAME': 'django_password_validators.password_character_requirements.password_validation.PasswordCharacterValidator',
+        'OPTIONS': {
+             'min_length_digit': 1,
+             'min_length_alpha': 2,
+             'min_length_special': 3,
+             'min_length_lower': 4,
+             'min_length_upper': 5,
+             'special_characters': "~!@#$%^&*()_+{}\":;'[]"
+         }
+    },
+    
+]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
