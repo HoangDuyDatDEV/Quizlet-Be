@@ -179,11 +179,15 @@ def delete_class(request, pk):
 @api_view(['GET'])
 def search_class(request):
     keyword = request.GET.get('keyword','')
-    Class_list = Class.objects.filter(
-        Q(classname__icontains = keyword)
-    )
+    Class_list = Class.objects.all()
+    if keyword:
+      Class_list = Class.objects.filter(
+          Q(classname__icontains = keyword)
+      )
+    total = Class_list.count()
     data = ClassSerializer(Class_list, many = True).data
-    return Response(data)
+    result = {'total':total, 'data':data}
+    return Response(result)
         
 # API lấy lớp theo ID 
 @api_view(['GET'])
