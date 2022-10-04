@@ -137,9 +137,7 @@ def get_all_class(request):
         
     if classes:
         result = ClassSerializer(classes, many = True).data
-        return Response({ 'data': result,
-                         'status': status.HTTP_200_OK,
-                          })
+        return Response(result)
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
     
@@ -198,11 +196,9 @@ def get_class_by_id(request, pk):
    numberOfCourse=CourseInClass.objects.filter(classID=pk).count()
    numberOfMember = UserInClass.objects.filter(permissions='member',classID=pk).count()
    if classes:
-      result = ClassSerializer(classes).data
-      return Response({'data':result,
-                        'numberOfCourse':numberOfCourse,
-                        'numberOfCMember':numberOfMember
-                        })
+      data = ClassSerializer(classes).data
+      result = {'data':data,'numberOfCourse':numberOfCourse,'numberOfCMember':numberOfMember}
+      return Response(result)
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
