@@ -1,5 +1,6 @@
 
 from sre_constants import SUCCESS
+from webbrowser import get
 
 from xmlrpc.client import ResponseError
 from .models import *
@@ -87,9 +88,9 @@ class UserView(APIView):
     
     user=User.objects.filter(id=payload['id']).first()
     
-    serializer=UserSerializer(user)
+    result=UserSerializer(user).data
     
-    return Response(serializer.data)
+    return Response(result)
 #API đăng xuất
 class LogoutView(APIView):
   def post(self, request):
@@ -203,6 +204,37 @@ def get_class_by_id(request, pk):
                         })
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
+
+#API lấy lớp theo id người tạo lớp
+@api_view(['GET'])
+def get_class_by_id_creator(request, pk):
+    members=User.objects.filter(Q(id=pk))
+    classes=Class.objects.filter(members__in=members)
+    if classes:
+          result = ClassSerializer(classes,many=True).data
+          return Response({'data':result})
+    else:
+          return Response(status=status.HTTP_404_NOT_FOUND)
+#API lấy course theo id người tạo folder         
+@api_view(['GET'])
+def get_course_by_id_creator(request, pk):
+    courses=Course.objects.filter(userID=pk)
+
+    if courses:
+          result = CourseSerializer(courses,many=True).data
+          return Response({'data':result})
+    else:
+          return Response(status=status.HTTP_404_NOT_FOUND)
+#API lấy folder theo id người tạo folder         
+@api_view(['GET'])
+def get_folder_by_id_creator(request, pk):
+    folders=Folder.objects.filter(userID=pk)
+
+    if folders:
+          result = FolderSerializer(folders,many=True).data
+          return Response({'data':result})
+    else:
+          return Response(status=status.HTTP_404_NOT_FOUND)          
 
 #API thêm khóa học vào lớp 
 @api_view(['POST'])
