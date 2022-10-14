@@ -50,4 +50,7 @@ urlpatterns = [
     path('deleteCourseInFolder/<int:pk>/',  delete_course_in_folder),
     path('getCourseInFolderBy/<int:pk>/',  get_course_in_folder_by_id),
     path('getAllCourseInFolder/<int:pk>/', get_all_course_in_folder),
+    path('getClassByIDCreator/<int:pk>',  get_class_by_id_creator),
+    path('getCourseByIDCreator/<int:pk>',  get_course_by_id_creator),  
+    path('getFolderByIDCreator/<int:pk>',  get_folder_by_id_creator),
 ]

@@ -42,7 +42,7 @@ class Folder(models.Model):
     foldername=models.CharField(max_length=255)
     description=models.TextField(null=True)
     userID=models.ForeignKey(User,on_delete=models.CASCADE)  
-    courses=models.ManyToManyField(Course, through='CourseInFolder')
+    courses=models.ManyToManyField(Course, through='CourseInFolder', null=True)
 class Class(models.Model):
     id = models.AutoField(primary_key=True)
     classname=models.CharField(max_length=255)
