@@ -133,8 +133,7 @@ def edit_user(request, pk):
 #API lấy thông tin của tất cả các lớp 
 @api_view(['GET'])
 def get_all_class(request):   
-    classes =  Class.objects.all()
-        
+    classes =  Class.objects.all()   
     if classes:
         result = ClassSerializer(classes, many = True).data
         return Response({ 'data': result,
@@ -515,9 +514,12 @@ def search_course(request):
 @api_view(['GET'])
 def get_course_by_id(request, pk):
    courses = Course.objects.filter(pk=pk).first()
+   numberFlashcard=FlashCard.objects.filter(courseID=pk).count()
    if courses:
       result = CourseSerializer(courses).data
-      return Response(result)
+      return Response({'result':result,
+                       'numberFlashcard':numberFlashcard,
+      })
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
