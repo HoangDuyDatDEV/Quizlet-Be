@@ -244,8 +244,8 @@ def add_class_By_Member(request):
         
     if userinclass.is_valid():
         userinclass.save()
-
         return Response(userinclass.data, status=status.HTTP_201_CREATED)
+    
     return Response(userinclass.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -301,9 +301,7 @@ def get_all_course_in_class(request,pk):
     courseinclass =  CourseInClass.objects.filter(classID=pk)
     if courseinclass:
         result = CourseInClassSerializer(courseinclass, many = True).data
-        return Response({'data':result,
-                        
-                        })
+        return Response({'data':result})
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
@@ -325,8 +323,7 @@ def get_course_in_class_by_id(request, pk):
    
    if courseinclass:
       result = CourseInClassSerializer(courseinclass).data
-      return Response({'data':result,
-                        })
+      return Response({'data':result})
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
       
@@ -337,8 +334,7 @@ def get_folder_in_class_by_id(request, pk):
    
    if folderinclass:
       result = FolderInClassSerializer(folderinclass).data
-      return Response({'data':result,
-                        })
+      return Response({'data':result})
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -533,9 +529,7 @@ def get_all_flashcard(request, pk):
         
     if flashcard:
         result = CourseSerializer(flashcard, many = True).data
-        return Response({'data':result,
-                          'status':status.HTTP_200_OK,  
-                            })
+        return Response({'result':result,'status':status.HTTP_200_OK})
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
@@ -646,9 +640,7 @@ def get_all_course_in_folder(request,pk):
   
     if courseinfolder:
         result = CourseInFolderSerializer(courseinfolder, many = True).data
-        return Response({'data':result,
-                        
-                        })
+        return Response({'data':result})
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
