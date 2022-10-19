@@ -33,8 +33,8 @@ class FlashCard(models.Model):
     id=models.AutoField(primary_key=True)
     keyword=models.CharField(max_length=255)
     defindName=models.CharField(max_length=255)
-    image=models.ImageField(max_length=255, blank=True)
-    learned=models.CharField(max_length=20)
+    image=models.ImageField(max_length=255, null=True)
+    learned=models.CharField(max_length=20, blank=True)
     courseID=models.ForeignKey(Course, on_delete=models.CASCADE)
 
 class Folder(models.Model):
