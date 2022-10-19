@@ -1,6 +1,6 @@
 
 from sre_constants import SUCCESS
-from unittest import result
+from webbrowser import get
 
 from xmlrpc.client import ResponseError
 from .models import *
@@ -136,8 +136,7 @@ def edit_user(request, pk):
 #API lấy thông tin của tất cả các lớp 
 @api_view(['GET'])
 def get_all_class(request):   
-    classes =  Class.objects.all()
-        
+    classes =  Class.objects.all()   
     if classes:
         result = ClassSerializer(classes, many = True).data
         return Response(result)
@@ -204,6 +203,37 @@ def get_class_by_id(request, pk):
       return Response(result)
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
+
+# #API lấy lớp theo id người tạo lớp
+# @api_view(['GET'])
+# def get_class_by_id_creator(request, pk):
+#     members=User.objects.filter(Q(id=pk))
+#     classes=Class.objects.filter(members__in=members)
+#     if classes:
+#           result = ClassSerializer(classes,many=True).data
+#           return Response({'data':result})
+#     else:
+#           return Response(status=status.HTTP_404_NOT_FOUND)
+# #API lấy course theo id người tạo folder         
+# @api_view(['GET'])
+# def get_course_by_id_creator(request, pk):
+#     courses=Course.objects.filter(userID=pk)
+
+#     if courses:
+#           result = CourseSerializer(courses,many=True).data
+#           return Response({'data':result})
+#     else:
+#           return Response(status=status.HTTP_404_NOT_FOUND)
+# #API lấy folder theo id người tạo folder         
+# @api_view(['GET'])
+# def get_folder_by_id_creator(request, pk):
+#     folders=Folder.objects.filter(userID=pk)
+
+#     if folders:
+#           result = FolderSerializer(folders,many=True).data
+#           return Response({'data':result})
+#     else:
+#           return Response(status=status.HTTP_404_NOT_FOUND)          
 
 #API thêm khóa học vào lớp 
 @api_view(['POST'])
@@ -480,9 +510,12 @@ def search_course(request):
 @api_view(['GET'])
 def get_course_by_id(request, pk):
    courses = Course.objects.filter(pk=pk).first()
+   numberFlashcard=FlashCard.objects.filter(courseID=pk).count()
    if courses:
       result = CourseSerializer(courses).data
-      return Response(result)
+      return Response({'result':result,
+                       'numberFlashcard':numberFlashcard,
+      })
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -528,8 +561,10 @@ def get_all_flashcard(request, pk):
     flashcard = FlashCard.objects.filter(courseID=pk)
         
     if flashcard:
-        result = CourseSerializer(flashcard, many = True).data
-        return Response({'result':result,'status':status.HTTP_200_OK})
+        result = FlashcardSerializer(flashcard, many = True).data
+        return Response({'data':result,
+                          'status':status.HTTP_200_OK,  
+                            })
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
@@ -637,7 +672,7 @@ def delete_course_in_folder(request,pk):
 @api_view(['GET'])
 def get_all_course_in_folder(request,pk):   
     courseinfolder =  CourseInFolder.objects.filter(folderID=pk)
-  
+    
     if courseinfolder:
         result = CourseInFolderSerializer(courseinfolder, many = True).data
         return Response({'data':result})
