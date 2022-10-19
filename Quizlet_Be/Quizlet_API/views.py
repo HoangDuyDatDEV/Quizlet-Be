@@ -435,6 +435,7 @@ def search_all_user_to_add_member(request):
     data = UserSerializer(User_list, many = True).data
     result = {'data':data}
     return Response(result)
+
     # data=request.data
     # classID=data.get('classID')
     # userinclassID=UserInClass.objects.get(classID=classID).userID
