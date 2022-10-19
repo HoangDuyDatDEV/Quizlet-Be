@@ -565,7 +565,7 @@ def get_all_flashcard(request, pk):
     flashcard = FlashCard.objects.filter(courseID=pk)
         
     if flashcard:
-        result = CourseSerializer(flashcard, many = True).data
+        result = FlashcardSerializer(flashcard, many = True).data
         return Response({'data':result,
                           'status':status.HTTP_200_OK,  
                             })
@@ -676,7 +676,7 @@ def delete_course_in_folder(request,pk):
 @api_view(['GET'])
 def get_all_course_in_folder(request,pk):   
     courseinfolder =  CourseInFolder.objects.filter(folderID=pk)
-  
+    
     if courseinfolder:
         result = CourseInFolderSerializer(courseinfolder, many = True).data
         return Response({'data':result,
