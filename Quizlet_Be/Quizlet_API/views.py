@@ -199,7 +199,7 @@ def get_class_by_id(request, pk):
    numberOfMember = UserInClass.objects.filter(permissions='member',classID=pk).count()
    if classes:
       data = ClassSerializer(classes).data
-      result = {'data':data,'numberOfCourse':numberOfCourse,'numberOfCMember':numberOfMember}
+      result = {'data':data,'numberOfCourse':numberOfCourse,'numberOfMember':numberOfMember}
       return Response(result)
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
@@ -331,7 +331,7 @@ def get_all_course_in_class(request,pk):
     courseinclass =  CourseInClass.objects.filter(classID=pk)
     if courseinclass:
         result = CourseInClassSerializer(courseinclass, many = True).data
-        return Response({'data':result})
+        return Response(result)
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
@@ -353,7 +353,7 @@ def get_course_in_class_by_id(request, pk):
    
    if courseinclass:
       result = CourseInClassSerializer(courseinclass).data
-      return Response({'data':result})
+      return Response(result)
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
       
@@ -567,10 +567,6 @@ def get_all_flashcard(request, pk):
                             })
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
-
-
-
-
 
 ############# FolderAPI
 
