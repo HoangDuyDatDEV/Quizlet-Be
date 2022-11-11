@@ -183,7 +183,8 @@ def search_class(request):
     Class_list = Class.objects.all()
     if keyword:   
       Class_list = Class.objects.filter(
-          Q(classname__icontains = keyword)
+          Q(classname__icontains = keyword) |
+          Q(schoolname__icontains = keyword)
       )
     
     total = Class_list.count()
