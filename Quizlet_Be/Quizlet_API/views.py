@@ -330,6 +330,7 @@ def check_Duplicate_Member(userID,ID):
 @api_view(['GET'])
 def get_all_course_in_class(request,pk):   
     courseinclass =  CourseInClass.objects.filter(classID=pk)
+
     if courseinclass:
         result = CourseInClassSerializer(courseinclass, many = True).data
         return Response(result)
@@ -351,6 +352,7 @@ def get_all_folder_in_class(request,pk):
 @api_view(['GET'])
 def get_course_in_class_by_id(request, pk):
    courseinclass = CourseInClass.objects.filter(pk=pk).first()
+   
    
    if courseinclass:
       result = CourseInClassSerializer(courseinclass).data
@@ -513,10 +515,9 @@ def get_course_by_id(request, pk):
    courses = Course.objects.filter(pk=pk).first()
    numberFlashcard=FlashCard.objects.filter(courseID=pk).count()
    if courses:
-      result = CourseSerializer(courses).data
-      return Response({'result':result,
-                       'numberFlashcard':numberFlashcard,
-      })
+        data = CourseSerializer(courses).data
+        result = {'data':data, 'numberFlashcard':numberFlashcard}
+        return Response(result)
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
