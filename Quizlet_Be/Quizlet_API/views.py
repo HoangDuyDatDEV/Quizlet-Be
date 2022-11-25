@@ -15,6 +15,9 @@ from http.client import REQUEST_ENTITY_TOO_LARGE
 from django.shortcuts import render
 from Quizlet_API import serializers
 from django.db.models import Q
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
 
 # UserAPI
 # Api đăng ký
@@ -197,7 +200,7 @@ def search_class(request):
 def get_class_by_id(request, pk):
    classes = Class.objects.filter(pk=pk).first()
    numberOfCourse=CourseInClass.objects.filter(classID=pk).count()
-   numberOfMember = UserInClass.objects.filter(permissions='member',classID=pk).count()
+   numberOfMember = UserInClass.objects.filter(permissions='member',classID=pk).count()+1
    if classes:
       data = ClassSerializer(classes).data
       result = {'data':data,'numberOfCourse':numberOfCourse,'numberOfMember':numberOfMember}
@@ -239,16 +242,22 @@ def get_class_by_id(request, pk):
 #API thêm khóa học vào lớp 
 @api_view(['POST'])
 def add_course_in_class(request):
-    data=request.data.copy()
+    data = request.data.copy()
     classID=data.get('classID')
+    courseID = data.get('courseID')
+    courses = Course.objects.filter(id = courseID).values("coursename")
+    #data['courseName'] = courses[0].coursename
+    course_name = list(courses)
+    #courses_detail = course_name.values()
+    #data['coursesName'] = str(courses_detail)
     data['numberOfCourse']=CourseInClass.objects.filter(classID=classID).count()+1 
+    data['numberCard']=FlashCard.objects.filter(courseID=courseID).count()
     courseinclass=CourseInClassSerializer(data=data)
     if courseinclass.is_valid():  
-     
+     #'course':courseName,
       courseinclass.save()
-      return Response({'data':courseinclass.data,
-                      'status':status.HTTP_201_CREATED,
-                      })
+      #result = {'data':courseinclass.data,}
+      return Response({'result':courseinclass.data,'coursename':courses, 'course_result':course_name,'status':status.HTTP_201_CREATED})
     return Response(courseinclass.errors,status=status.HTTP_400_BAD_REQUEST)
 
 #API thêm thư mục vào lớp
@@ -330,9 +339,11 @@ def check_Duplicate_Member(userID,ID):
 @api_view(['GET'])
 def get_all_course_in_class(request,pk):   
     courseinclass =  CourseInClass.objects.filter(classID=pk)
-
+    
     if courseinclass:
         result = CourseInClassSerializer(courseinclass, many = True).data
+        #courseID = result.courseID
+        #courseName= Course.filter(id=courseID).values() "course_detail": courseName
         return Response(result)
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
@@ -673,7 +684,7 @@ def get_all_course_in_folder(request,pk):
     
     if courseinfolder:
         result = CourseInFolderSerializer(courseinfolder, many = True).data
-        return Response({'data':result})
+        return Response(result)
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
@@ -684,8 +695,7 @@ def get_course_in_folder_by_id(request, pk):
    
    if courseinfolder:
       result = CourseInFolderSerializer(courseinfolder).data
-      return Response({'data':result,
-                        })
+      return Response({'data':result})
    else:
       return Response(status=status.HTTP_404_NOT_FOUND)
   
@@ -707,9 +717,11 @@ def get_class_by_id_creator(request, pk):
 @api_view(['GET'])
 def get_course_by_id_creator(request, pk):
     courses=Course.objects.filter(userID=pk)
-
+    #numberFlashcard=FlashCard.objects.filter(courseID=).count()
     if courses:
-          result = CourseSerializer(courses,many=True).data
+          data = CourseSerializer(courses,many=True).data
+          
+          result = {'data':data}
           return Response(result)
     else:
           return Response(status=status.HTTP_404_NOT_FOUND)

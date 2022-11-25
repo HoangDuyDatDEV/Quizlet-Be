@@ -29,6 +29,8 @@ class Course(models.Model):
     allowDisplay=models.CharField(max_length=20)
     allowEdit=models.CharField(max_length=20)
     userID=models.ForeignKey(User, on_delete=models.CASCADE)
+    #numberFlashcard = models.IntegerField(default=0)
+    
 class FlashCard(models.Model):
     id=models.AutoField(primary_key=True)
     keyword=models.CharField(max_length=255)
@@ -36,7 +38,7 @@ class FlashCard(models.Model):
     image=models.ImageField(max_length=255, null=True)
     learned=models.CharField(max_length=20, blank=True)
     courseID=models.ForeignKey(Course, on_delete=models.CASCADE)
-
+    
 class Folder(models.Model):
     id=models.AutoField(primary_key=True)
     foldername=models.CharField(max_length=255)
@@ -65,6 +67,8 @@ class CourseInClass(models.Model):
     id = models.AutoField(primary_key=True)
     numberOfCourse=models.IntegerField(default=0,blank=True)
     courseID=models.ForeignKey(Course, on_delete=models.CASCADE)
+    coursesName = models.CharField(max_length=100, blank=True)
+    numberCard = models.IntegerField(default=0)
     classID=models.ForeignKey(Class, on_delete=models.CASCADE)
 
 class CourseInFolder(models.Model):
