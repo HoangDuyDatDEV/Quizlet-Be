@@ -74,11 +74,17 @@ class CourseInClass(models.Model):
 class CourseInFolder(models.Model):
     id = models.AutoField(primary_key=True)
     numberOfCourse=models.IntegerField(default=0,blank=True)
+    coureName = models.CharField(max_length = 100, blank=True)
+    numberCard = models.IntegerField(default = 0)
     courseID=models.ForeignKey(Course, on_delete=models.CASCADE)
     folderID=models.ForeignKey(Folder, on_delete=models.CASCADE)
+    
+    
 class FolderInClass(models.Model):
     id=models.AutoField(primary_key=True)
     numberOfFolder=models.IntegerField(default=0,blank=True)
     classID=models.ForeignKey(Class, on_delete=models.CASCADE)
     folderID=models.ForeignKey(Folder, on_delete=models.CASCADE)
+    folderName = models.CharField(max_length=100, blank=True)
+    numberCourse = models.IntegerField(default=0, blank = True)
 

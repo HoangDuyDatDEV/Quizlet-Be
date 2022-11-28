@@ -246,18 +246,15 @@ def add_course_in_class(request):
     classID=data.get('classID')
     courseID = data.get('courseID')
     courses = Course.objects.filter(id = courseID).values("coursename")
-    #data['courseName'] = courses[0].coursename
     course_name = list(courses)
-    #courses_detail = course_name.values()
-    #data['coursesName'] = str(courses_detail)
+    courses_detail = course_name[0].get('coursename')
+    data['coursesName'] = str(courses_detail)
     data['numberOfCourse']=CourseInClass.objects.filter(classID=classID).count()+1 
     data['numberCard']=FlashCard.objects.filter(courseID=courseID).count()
     courseinclass=CourseInClassSerializer(data=data)
     if courseinclass.is_valid():  
-     #'course':courseName,
       courseinclass.save()
-      #result = {'data':courseinclass.data,}
-      return Response({'result':courseinclass.data,'coursename':courses, 'course_result':course_name,'status':status.HTTP_201_CREATED})
+      return Response({'result':courseinclass.data,'coursedetail':courses, 'course_result':course_name, 'course_name': courses_detail,'status':status.HTTP_201_CREATED})
     return Response(courseinclass.errors,status=status.HTTP_400_BAD_REQUEST)
 
 #API thêm thư mục vào lớp
@@ -265,12 +262,23 @@ def add_course_in_class(request):
 def add_folder_in_class(request):
     data=request.data.copy()
     classID=data.get('classID')
+    folderID = data.get('folderID')
+    folders = Folder.objects.filter(id = folderID).values("foldername")
+    folder_name = (list(folders))[0].get('foldername')
+    #courses_detail = course_name[0].get('coursename')
+    data['folderName'] = str(folder_name)
+    course_number = CourseInFolder.objects.filter(folderID = folderID).values("numberOfCourse")
+    coursenumber = (list(course_number))[0].get('numberOfCourse')
+    numbercourse = len(list(course_number))
+    data['numberCourse'] = numbercourse
     data['numberOfFolder']=FolderInClass.objects.filter(classID=classID).count()+1 
     folderinclass=FolderInClassSerializer(data=data)
     
     if folderinclass.is_valid():  
       folderinclass.save()
       return Response({'data':folderinclass.data,
+                       'numbercourse': course_number,
+                       'lengthcourse': numbercourse,
                       'status':status.HTTP_201_CREATED,
                       })
     return Response(folderinclass.errors,status=status.HTTP_400_BAD_REQUEST)
@@ -681,9 +689,17 @@ def delete_course_in_folder(request,pk):
 @api_view(['GET'])
 def get_all_course_in_folder(request,pk):   
     courseinfolder =  CourseInFolder.objects.filter(folderID=pk)
+    courseid = CourseInFolder.objects.filter(folderID = pk).values('courseID')
+    #course_list = list(courseid)[0].get('courseID')
+    course_list = (list(courseid))[0].get('courseID')
+    course_name = Course.objects.filter(id = course_list).values('coursename')
+    # for i in course_list:
+    #     course_id = course_list[i].get('courseID')
+    #     course_name = Course.objects.filter(id = course_id[i]).values('coursename')
     
     if courseinfolder:
-        result = CourseInFolderSerializer(courseinfolder, many = True).data
+        data = CourseInFolderSerializer(courseinfolder, many = True).data
+        result = {'result': data, 'course_id':courseid, 'course_name': course_name}
         return Response(result)
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
