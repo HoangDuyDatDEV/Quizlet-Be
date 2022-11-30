@@ -309,6 +309,12 @@ def add_Member_To_Class(request,pk):
       if (check_Duplicate_Member(member,userID)==False ):
           data['permissions']='member'
           data['numberOfUsers']=UserInClass.objects.filter(classID=classID,permissions='member').count()+1 
+          
+          member_name = User.objects.filter(id = userID).values('fullname')
+          user_name = list(member_name)
+          member_detail = user_name[0].get('fullname')
+          data['fullname'] = str(member_detail)
+          
           userinclass= UserInClassSerializer(data=data)
           
           if userinclass.is_valid():
@@ -665,12 +671,22 @@ def get_folder_by_id(request, pk):
 def add_course_in_folder(request):
     data=request.data.copy()
     folderID=data.get('folderID')
+    courseID = data.get('courseID')
+    
+    courses = Course.objects.filter(id = courseID).values('coursename')
+    course_name = list(courses)
+    courses_detail = course_name[0].get('coursename')
+    
+    data['courseName'] = str(courses_detail)
     data['numberOfCourse']=CourseInFolder.objects.filter(folderID=folderID).count()+1 
+    data['numberCard']=FlashCard.objects.filter(courseID=courseID).count()
+    
     courseinfolder=CourseInFolderSerializer(data=data)
     if courseinfolder.is_valid():  
      
       courseinfolder.save()
       return Response({'data':courseinfolder.data,
+                       'coursename': courses_detail,
                       'status':status.HTTP_201_CREATED,
                       })
     return Response(courseinfolder.errors,status=status.HTTP_400_BAD_REQUEST)
@@ -689,17 +705,22 @@ def delete_course_in_folder(request,pk):
 @api_view(['GET'])
 def get_all_course_in_folder(request,pk):   
     courseinfolder =  CourseInFolder.objects.filter(folderID=pk)
-    courseid = CourseInFolder.objects.filter(folderID = pk).values('courseID')
-    #course_list = list(courseid)[0].get('courseID')
-    course_list = (list(courseid))[0].get('courseID')
-    course_name = Course.objects.filter(id = course_list).values('coursename')
-    # for i in course_list:
-    #     course_id = course_list[i].get('courseID')
-    #     course_name = Course.objects.filter(id = course_id[i]).values('coursename')
+    # courseid = CourseInFolder.objects.filter(folderID = pk).values('courseID')
+    # #course_list = list(courseid)[0].get('courseID')
+    # course_list = (list(courseid))[0].get('courseID')
+    # course_name = Course.objects.filter(id = course_list).values('coursename')
+    # # for i in course_list:
+    # #     course_id = course_list[i].get('courseID')
+    # #     course_name = Course.objects.filter(id = course_id[i]).values('coursename')
+    # listcourse = list(courseid)
+    # list_course_id = []
+    # for x in range(len(listcourse)):
+    #     list_course_id.append(Course.objects.filter(id = listcourse[x] ).values('coursename'))
+    #     # data['coursename'] = 
     
     if courseinfolder:
         data = CourseInFolderSerializer(courseinfolder, many = True).data
-        result = {'result': data, 'course_id':courseid, 'course_name': course_name}
+        result = {'result': data }
         return Response(result)
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
