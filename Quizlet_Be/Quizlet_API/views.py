@@ -287,7 +287,12 @@ def add_folder_in_class(request):
 @api_view(['POST'])
 def add_class_By_Member(request):
     data=request.data.copy()
+    userID = data.get('userID')
     data['permissions']='created'
+    admin = User.objects.filter(id = userID).values("fullname")
+    admin_name = list(admin)
+    ad_fullname = admin_name[0].get('fullname')
+    data['adname'] = str(ad_fullname)
     userinclass= UserInClassSerializer(data=data)
         
     if userinclass.is_valid():
@@ -401,9 +406,12 @@ def get_folder_in_class_by_id(request, pk):
 @api_view(['GET'])
 def get_all_user_in_class(request,pk):   
     userinclass =  UserInClass.objects.filter(classID=pk,permissions='member')
+    admin = UserInClass.objects.filter(classID=pk, permissions='created')
+    if userinclass or admin:
+        data = UserInClassSerializer(userinclass, many = True).data
+        adname = UserInClassSerializer(admin, many=True).data
         
-    if userinclass:
-        result = UserInClassSerializer(userinclass, many = True).data
+        result = {'data':data, 'admin': adname}
         return Response(result)
     else:
         return Response(status = status.HTTP_404_NOT_FOUND)
@@ -459,6 +467,7 @@ def search_all_user_to_add_member(request):
     data = UserSerializer(User_list, many = True).data
     result = {'data':data}
     return Response(result)
+
     # data=request.data
     # classID=data.get('classID')
     # userinclassID=UserInClass.objects.get(classID=classID).userID

@@ -62,7 +62,7 @@ class UserInClass(models.Model):
     fullname = models.CharField(max_length=100,blank=True)
     userID=models.ForeignKey(User, on_delete=models.CASCADE)
     classID=models.ForeignKey(Class, on_delete=models.CASCADE)
-
+    adname = models.CharField(max_length=100, blank=True)
     
 class CourseInClass(models.Model):
     id = models.AutoField(primary_key=True)
