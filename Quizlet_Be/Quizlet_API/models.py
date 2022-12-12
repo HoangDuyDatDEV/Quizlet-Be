@@ -29,6 +29,7 @@ class Course(models.Model):
     allowDisplay=models.CharField(max_length=20)
     allowEdit=models.CharField(max_length=20)
     userID=models.ForeignKey(User, on_delete=models.CASCADE)
+    adname = models.CharField(max_length=100, blank=True)
     #numberFlashcard = models.IntegerField(default=0)
     
 class FlashCard(models.Model):

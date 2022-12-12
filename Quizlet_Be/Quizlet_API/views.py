@@ -464,6 +464,8 @@ def search_all_user_to_add_member(request):
       User_list = User.objects.filter(
           Q(fullname__icontains = keyword)
       )
+    else:
+        User_list = None
     data = UserSerializer(User_list, many = True).data
     result = {'data':data}
     return Response(result)
@@ -548,8 +550,10 @@ def search_course(request):
 def get_course_by_id(request, pk):
    courses = Course.objects.filter(pk=pk).first()
    numberFlashcard=FlashCard.objects.filter(courseID=pk).count()
+   
    if courses:
         data = CourseSerializer(courses).data
+        adname = User.objects.filter()
         result = {'data':data, 'numberFlashcard':numberFlashcard}
         return Response(result)
    else:
